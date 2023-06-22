@@ -107,10 +107,10 @@ class OffboardControl(Node):
 
         # CONSTANTS
         self.TAKEOFF_HEIGHT = -3.0
-        self.HOME_HEIGHT = -10.0
+        self.HOME_HEIGHT = -8.0
         self.ORBIT_HEIGHT = -5.0
         self.ORBIT_RADIUS = 5.0
-        self.ORBIT_OMEGA = 0.3
+        self.ORBIT_OMEGA = 0.2
 
 
     def boat_position_callback(self, msg):
@@ -118,7 +118,7 @@ class OffboardControl(Node):
         Subscriber callback function to add new boat positions to the boat queue.
         '''
         self.boat_queue.append([msg.x,msg.y])
-        print(f'Updated boat_queue: {self.boat_queue}')
+        self.get_logger().info(f'Updated boat_queue: {self.boat_queue}')
 
 
     def vehicle_status_callback(self, msg):
@@ -166,17 +166,21 @@ class OffboardControl(Node):
         current_position = self.drone_odom.position
         delta = np.linalg.norm(target_position-current_position)/abs_speed  # time step
         steps = int(delta/self.cmd_timer_period)
-        yaw = np.arctan2(target_position[1],target_position[0])
+        # yaw = np.arctan2(target_position[1],target_position[0])
+        vx = (target_position[0]-current_position[0])/delta
+        vy = (target_position[1]-current_position[1])/delta
+        vz = (target_position[2]-current_position[2])/delta
+        yaw = np.arctan2(vy,vx)
         for i in range(steps+1):
             point = TrajectorySetpoint()
             point.position[0] = current_position[0]+(target_position[0]-current_position[0])/steps*i
             point.position[1] = current_position[1]+(target_position[1]-current_position[1])/steps*i
             point.position[2] = current_position[2]+(target_position[2]-current_position[2])/steps*i
-            point.velocity[0] = (target_position[0]-current_position[0])/delta
-            point.velocity[1] = (target_position[1]-current_position[1])/delta
-            point.velocity[2] = (target_position[2]-current_position[2])/delta
+            point.velocity = [vx,vy,vz]
             point.yaw = yaw
             self.path.append(point)
+
+        # for i in range(steps+1):
  
     def publish_vehicle_cmd(self, command, param1=0.0, param2=0.0):
         '''
@@ -296,6 +300,12 @@ class OffboardControl(Node):
                 else:
                     # Hover until timeout, then land
                     self.timeout_timer += 1
+                    # Reorientate to face +y / forward
+                    trajectory_msg = TrajectorySetpoint()
+                    trajectory_msg.position = [0.0,0.0,self.HOME_HEIGHT]
+                    trajectory_msg.yaw = np.pi/2
+                    trajectory_msg.timestamp = int(Clock().now().nanoseconds / 1000) # microseconds
+                    self.publisher_trajectory_setpoint.publish(trajectory_msg)
                     if self.timeout_timer >= self.timeout/self.cmd_timer_period:
                         self.publish_vehicle_cmd(VehicleCommand.VEHICLE_CMD_NAV_LAND)
                         self.cmd_state = 'LAND'
