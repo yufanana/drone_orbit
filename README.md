@@ -33,10 +33,18 @@ Change directory into the ROS2 workspace
 cd ~/ros_ws/src
 ```
 
+Add SSH key to your github account. Follow instructions [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+
+View the generated public key.
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
 Clone the repository
 
 ```bash
-git clone git@github.com:yufanana/Unmanned34757.git
+git clone git@github.com:yufanana/drone_orbit.git
 ```
 
 Build with colon
