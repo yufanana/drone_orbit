@@ -8,7 +8,7 @@ The scripts were tested using software-in-the-loop (SITL). NED coordinate system
 
 ## Description of Path
 
-<img src="imgs/drone-tradjectory.png" width="500">
+<img src="docs/drone-tradjectory.png" width="500">
 
 A video of the simulation demo can be found [on YouTube here](https://youtu.be/A16FTK1mKx8).
 
@@ -16,7 +16,7 @@ The drone will perform a clockwise orbit about the boat position, facing inwards
 
 `cmd_timer_callback` runs like a state machine to command the drone at different stages of the mission.
 
-<img src="imgs/drone-sm.png" width="500">
+<img src="docs/drone-sm.png" width="500">
 
 ## Build the ROS2 package
 
