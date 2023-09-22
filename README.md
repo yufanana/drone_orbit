@@ -80,13 +80,18 @@ Run tmux to have multiple terminals ([tmux cheatsheet](https://tmuxcheatsheet.co
 tmux
 ```
 
+- The common shortcuts to use are
+  - Ctrl + b   %          : split pane with horizontal layout
+  - Ctrl + b   "          : split pane with vertical layout
+  - Ctrl + b   arrow key  : switch pane to the direction 
+
 Source the setup file in each new terminal session
 
 ```bash
 source /ros_ws/install/setup.bash
 ```
 
-Run software-in-the-loop, brings up Gazebo.
+Run software-in-the-loop. This brings up Gazebo.
 
 ```bash
 ./start_sitl.sh
